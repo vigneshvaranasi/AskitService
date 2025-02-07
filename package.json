@@ -12,9 +12,11 @@
   "type": "commonjs",
   "description": "",
   "dependencies": {
+    "@types/bad-words": "^3.0.3",
     "@types/cors": "^2.8.17",
     "@types/jsonwebtoken": "^9.0.8",
     "@types/mongoose": "^5.11.96",
+    "bad-words": "^4.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "jsonwebtoken": "^9.0.2",

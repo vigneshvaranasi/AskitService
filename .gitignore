@@ -1,3 +1,6 @@
 .env
 dist
 node_modules
+get_context.ps1
+*.ps1
+code_context.txt

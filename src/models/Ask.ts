@@ -10,6 +10,10 @@ export const AskSchema = new Schema({
         required: true,
         ref: 'User'
     },
+    room:{
+        type:Types.ObjectId,
+        ref:'Room'
+    },
     timestamp: {
         type: Date,
         default: Date.now
@@ -17,15 +21,7 @@ export const AskSchema = new Schema({
     replies:[{
         type: Types.ObjectId,
         ref: 'Reply'
-    }],
-    room:{
-        type:Types.ObjectId,
-        ref:'Room'
-    },
-    answered:{
-        type:Boolean,
-        default:false
-    }
+    }]
 })
 
 export const askModel = model('Ask', AskSchema);

@@ -1,42 +1,97 @@
 import WebSocket from "ws";
-import mongoose from "mongoose";
 import { configDotenv } from "dotenv";
-import { ObjectId } from "mongoose";
+import connectToDB from "./config/db";
 import { authenticateUser } from "./utils/userAuth";
-import { attendeesType, replyType, asksType, roomType, createRoomType } from "./types";
-import { RoomSchema } from "./models/Room";
+import joinRoom from "./controllers/joinRoom";
+import ask from "./controllers/ask";
+import upvote from "./controllers/upvote";
+import markAsAnswered from "./controllers/markAsAnswered";
+import endRoom from "./controllers/endRoom";
+import leaveRoom from "./controllers/leaveRoom";
+import { ROOMS } from "./types/Base";
+import mongoose from "mongoose";
+import { userModel } from "./models/User";
+import { findUserRoom } from "./utils/commonUtils";
 configDotenv();
-mongoose.connect(process.env.MONGO_URI!)
-  .then(() => {
-    console.log("Connected to MongoDB");
-  })
-  .catch((err) => {
-    console.error(err);
-  });
+connectToDB();
+
+
+const MODE = process.env.MODE || "dev";
 const PORT = Number(process.env.PORT) || 8080;
-const wss = new WebSocket.Server({port:PORT as number});
+const wss = new WebSocket.Server({ port: PORT as number });
 
-const rooms = [] as roomType[];
 
-wss.on("connection",async (socket, req)=>{
-    // on Clients Connection
-    const token= req.headers["sec-websocket-protocol"] as string;
+let ROOMS: ROOMS = {};
 
+wss.on("connection", async (socket, req) => {
+
+    // const tempIdSpeaker = "677eb68aa829c1bd4b084270"
+    // const tempIdAttendee = "677eb68fa829c1bd4b084274"
+    // const tempIdAttendee2 = "67a0c7be16a4cef907e33782"
+
+    const token = req.headers["sec-websocket-protocol"] as string;
     const user = await authenticateUser(token);
-
-    
-    if(!user){
-        socket.close(401, "Unauthorized");
+    const userId = user?._id.toString();
+    if (!user) {
+      socket.close(401, "Unauthorized");
     }
-    
-    
-    socket.on("message", (message)=>{
-        // on Message 
-        console.log(`Received: ${message}`);
-        socket.send(`you sent: ${message}`);
 
-        const parsedMessage = JSON.parse(message.toString());
+  socket.on("message", async (message) => {
+    // on Message 
+    console.log(`Received: ${message}`);
+    socket.send(`you sent: ${message}`);
 
-        
-    });
+    const parsedMessage = JSON.parse(message.toString());
+    const type = parsedMessage.type;
+    const joinCode = parsedMessage.payload.joinCode;
+    // Testing join
+    if (type === "join") {
+      await joinRoom(socket, userId as string, ROOMS, joinCode);
+    }
+    // if (type === "joinn") {
+    //   await joinRoom(socket, tempIdAttendee, ROOMS, joinCode);
+    // }
+    // if (type === "joinee") {
+    //   await joinRoom(socket, tempIdAttendee2, ROOMS, joinCode);
+    // }
+
+    // Testing ask
+    if (type === "ask") {
+      await ask(socket, joinCode, ROOMS, parsedMessage.payload, userId as string);
+    }
+    // Testing Upvote
+    if (type === "upvote") {
+      const upv = parsedMessage.payload.upvote;
+      const askId = parsedMessage.payload.askId;
+      await upvote(socket, joinCode, ROOMS, askId, upv)
+    }
+    // Testing Mark as Answered
+    if (type === "answered") {
+      const askId = parsedMessage.payload.askId;
+      await markAsAnswered(socket, joinCode, ROOMS, askId)
+    }
+
+    // Testing Leave
+    if (type === "leave") {
+      await leaveRoom(socket, joinCode, ROOMS)
+    }
+
+    // Testing End Room
+    if (type === "end") {
+      await endRoom(socket, joinCode, ROOMS)
+    }
+  });
+
+  socket.on("close", async () => {
+    const userData = findUserRoom(socket, ROOMS);
+    if (!userData) return;
+
+    const { joinCode, room, role } = userData;
+
+    if (role === "speaker") {
+      await endRoom(socket, joinCode, ROOMS)
+    } else {
+      await leaveRoom(socket, joinCode, ROOMS)
+    }
+  })
 })

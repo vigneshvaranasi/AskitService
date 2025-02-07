@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { userModel } from '../models/User';
+import { retrieveRoomByJoinCode } from './dbutils';
+import WebSocket from 'ws';
 type decoded = {
     _id:string;
     email:string;
@@ -17,5 +19,22 @@ export async function authenticateUser(token:string) {
     }catch(err: any){
         console.log("Authentication Failed: ", err.message);
         return null;
+    }
+}
+
+export async function verifyRoom(joinCode: string, socket: WebSocket) {
+    try {
+        const room = await retrieveRoomByJoinCode(joinCode);
+        console.log('room in Verify: ', room);
+        
+        if (room) {
+            return room;
+        } else {
+            socket.close(1008, 'Room not Found');
+            return null;
+        }
+    } catch (err) {
+        console.log("Error verifying room", err);
+        socket.close(1011, 'Internal Server Error');
     }
 }
