@@ -25,9 +25,10 @@ export async function retriveRoomById(joinCode: string) {
   return room
 }
 export async function retrieveRoomByJoinCode(joinCode: string) {
+  // console.log(joinCode);
   let room = await roomModel.findOne({
     joinCode: joinCode,
-    active: true
+    activeStatus: true
   })
   return room
 }
@@ -82,10 +83,10 @@ export async function newAsk(ask: any) {
 
 export async function endRoomDB(joinCode: string) {
   try {
-    let room = await roomModel.updateOne(
-      { joinCode: joinCode },
-      { active: false }
-    )
+    // let room = await roomModel.updateOne(
+    //   { joinCode: joinCode },
+      // { activeStatus: false }
+    // )
   } catch (err) {
     if (err instanceof Error) {
       console.log("Error ending Room: ", err.message);

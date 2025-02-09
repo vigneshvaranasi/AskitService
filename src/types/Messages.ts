@@ -33,6 +33,7 @@ export interface JoinPingPayload {
 export interface JoinNotifyPayload {
     message: string;
     asks: Ask[];
+    role?: "speaker" | "attendee";
 }
 export interface AskPayload {
     question: string;
@@ -42,6 +43,7 @@ export interface AskPingPayload {
     ask: string;
     id: number;
     upvote: number;
+    upvotedBy: string[];
 }
 export interface UpvotePayload {
     askId: string;
@@ -51,6 +53,7 @@ export interface UpvotePayload {
 export interface UpvotePingPayload {
     id: number;
     upvote: number;
+    upvotedBy: string[];
 }
 export interface AnsweredPayload {
     askId: string;

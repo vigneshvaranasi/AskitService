@@ -2,7 +2,8 @@ import WebSocket from "ws";
 import { ROOMS, Ask } from '../types/Base';
 import { UpvotePingPayload, WsMessage } from "../types/Messages";
 import { Ping } from "../utils/commonUtils";
-export async function upvote(socket: WebSocket, joinCode: string, ROOMS: ROOMS, askId: number,upvote:number) {
+export async function upvote(socket: WebSocket, joinCode: string, ROOMS: ROOMS, askId: number,upvote:number,userId:string) {
+    console.log("upvote")
     if (!ROOMS[joinCode]) {
         socket.send(JSON.stringify({ type: "error", message: "Room not found" }));
         socket.close(1008, 'Room Not Found');
@@ -20,10 +21,21 @@ export async function upvote(socket: WebSocket, joinCode: string, ROOMS: ROOMS, 
         return;
     }
     let currUpVotes = null;
+    let currUpVotedBy = null;
     for (let ask of ROOMS[joinCode].asks) {
         if (ask.id === askId) {
-            ask.upvotes += upvote;
+            console.log("Here Reached")
             currUpVotes = Number(ask.upvotes);
+            if(upvote === 1 && !ask.upvotedBy.includes(userId)){
+                ask.upvotedBy.push(userId);
+                console.log("Here Reached 2")
+            }else if( ask.upvotedBy.includes(userId) || upvote === -1){
+                ask.upvotedBy = ask.upvotedBy.filter((upvoter)=>upvoter!==userId);
+                console.log("Here Reached 3")
+            }
+            currUpVotes = ask.upvotedBy.length;
+            ask.upvotes = currUpVotes;
+            currUpVotedBy = ask.upvotedBy;
             break;
         }
     }
@@ -31,12 +43,14 @@ export async function upvote(socket: WebSocket, joinCode: string, ROOMS: ROOMS, 
         socket.send(JSON.stringify({ type: "error", message: "Invalid Ask" }));
         return;
     }
-
+    console.log("currUpVotes: ",currUpVotes)
+    console.log("currUpVotedBy: ",currUpVotedBy)
     const upvotePing : WsMessage<UpvotePingPayload> = {
         type:"upvotePing",
         payload:{
             id:askId,
-            upvote:currUpVotes
+            upvote:currUpVotes,
+            upvotedBy:currUpVotedBy as string[]
         }
     }
     Ping(upvotePing, ROOMS[joinCode]);

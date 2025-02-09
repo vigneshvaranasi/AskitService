@@ -13,7 +13,7 @@ export async function authenticateUser(token:string) {
         const secret = process.env.JWT_SECRET;
         const decodedUser = jwt.verify(token, secret as string) as decoded;
 
-        const user = await userModel.findById(decodedUser._id);
+        const user = await userModel.findOne({email: decodedUser.email});
         if(!user) throw new Error("User not found");
         return user;
     }catch(err: any){

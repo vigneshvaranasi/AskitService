@@ -9,6 +9,7 @@ import { Notify, Ping } from "../utils/commonUtils";
 import { verifyRoom } from "../utils/userAuth";
 
 export async function joinRoom(socket: WebSocket, id: string, ROOMS: ROOMS, joinCode: string) {
+    let role:"speaker"|"attendee" = "attendee";
     console.log('id: ', id);
     const room = await verifyRoom(joinCode, socket);
     console.log('room: ', room);
@@ -40,6 +41,7 @@ export async function joinRoom(socket: WebSocket, id: string, ROOMS: ROOMS, join
                 attendees: [],
                 asks: []
             }
+            role='speaker';
         }
         else {
             socket.close(1008, 'Room not Found');
@@ -50,7 +52,7 @@ export async function joinRoom(socket: WebSocket, id: string, ROOMS: ROOMS, join
     const joinPingMessage: WsMessage<JoinPingPayload> = {
         type: "joinPing",
         payload: {
-            attendees: ROOMS[joinCode].attendees.length
+            attendees: ROOMS[joinCode].attendees.length,
         }
     }
     Ping(joinPingMessage, ROOMS[joinCode]);
@@ -58,7 +60,8 @@ export async function joinRoom(socket: WebSocket, id: string, ROOMS: ROOMS, join
         type: "joinNotify",
         payload: {
             message: "You have joined the Room",
-            asks: ROOMS[joinCode].asks
+            asks: ROOMS[joinCode].asks,
+            role: role
         }
     }
     Notify(joinNotifyMessage, socket);

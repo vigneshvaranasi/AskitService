@@ -4,6 +4,7 @@ export type Ask = {
     question: string;
     upvotes: number;
     answered: boolean;
+    upvotedBy: string[];
 }
 export type Room = {
     id:string;

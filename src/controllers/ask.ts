@@ -67,6 +67,7 @@ export async function ask(socket: WebSocket, joinCode: string, ROOMS: ROOMS, ask
         answered: false,
         upvotes: 0,
         id: ROOMS[joinCode].asks.length+1,
+        upvotedBy:[]
     }
     ROOMS[joinCode].asks.push(newask)
     const askPingMessage: WsMessage<AskPingPayload> = {
@@ -74,7 +75,8 @@ export async function ask(socket: WebSocket, joinCode: string, ROOMS: ROOMS, ask
         payload: {
             ask: ask.question,
             id: ROOMS[joinCode].asks.length,
-            upvote: 0
+            upvote: 0,
+            upvotedBy:[]
         }
     }
     Ping(askPingMessage, ROOMS[joinCode]);
