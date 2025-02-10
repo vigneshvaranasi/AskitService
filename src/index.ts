@@ -21,9 +21,9 @@ const wss = new WebSocket.Server({ port: PORT as number });
 
 let ROOMS: ROOMS = {};
 
-setInterval(() => {
-  console.log("ROOMS: ", ROOMS);
-}, 4000);
+// setInterval(() => {
+//   console.log("ROOMS: ", ROOMS);
+// }, 4000);
 
 wss.on("connection", async (socket, req) => {
   // const tempIdSpeaker = "677eb68aa829c1bd4b084270"
@@ -33,7 +33,6 @@ wss.on("connection", async (socket, req) => {
   const token = req.headers["sec-websocket-protocol"] as string;
   const user = await authenticateUser(token);
   const userId = user?._id.toString();
-  console.log('userId: ', userId);
   if (!user) {
     socket.close(1008, "Unauthorized");
     return;
@@ -49,7 +48,6 @@ wss.on("connection", async (socket, req) => {
       
       // Testing join
       if (type === "join") {
-        console.log("Socket Reached Here")
         await joinRoom(socket, userId as string, ROOMS, joinCode);
       }
       // if (type === "joinn") {
@@ -90,7 +88,7 @@ wss.on("connection", async (socket, req) => {
         await endRoom(socket, joinCode, ROOMS);
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
       socket.close(1008, "Invalid Message");
     }
   });

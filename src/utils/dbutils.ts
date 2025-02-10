@@ -25,7 +25,6 @@ export async function retriveRoomById(joinCode: string) {
   return room
 }
 export async function retrieveRoomByJoinCode(joinCode: string) {
-  // console.log(joinCode);
   let room = await roomModel.findOne({
     joinCode: joinCode,
     activeStatus: true
@@ -73,9 +72,9 @@ export async function newAsk(ask: any) {
     return newAsk
   } catch (err) {
     if (err instanceof Error) {
-      console.log("Error creating Ask: ", err.message);
+      console.error("Error creating Ask: ", err.message);
     } else {
-      console.log("Error creating Ask: ", err);
+      console.error("Error creating Ask: ", err);
     }
     return null;
   }
@@ -89,9 +88,9 @@ export async function endRoomDB(joinCode: string) {
     // )
   } catch (err) {
     if (err instanceof Error) {
-      console.log("Error ending Room: ", err.message);
+      console.error("Error ending Room: ", err.message);
     } else {
-      console.log("Error ending Room: ", err);
+      console.error("Error ending Room: ", err);
     }
   }
 }

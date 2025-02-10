@@ -17,16 +17,14 @@ export async function authenticateUser(token:string) {
         if(!user) throw new Error("User not found");
         return user;
     }catch(err: any){
-        console.log("Authentication Failed: ", err.message);
+        console.error("Authentication Failed: ", err.message);
         return null;
     }
 }
 
 export async function verifyRoom(joinCode: string, socket: WebSocket) {
     try {
-        const room = await retrieveRoomByJoinCode(joinCode);
-        console.log('room in Verify: ', room);
-        
+        const room = await retrieveRoomByJoinCode(joinCode);        
         if (room) {
             return room;
         } else {
@@ -34,7 +32,7 @@ export async function verifyRoom(joinCode: string, socket: WebSocket) {
             return null;
         }
     } catch (err) {
-        console.log("Error verifying room", err);
+        console.error("Error verifying room", err);
         socket.close(1011, 'Internal Server Error');
     }
 }

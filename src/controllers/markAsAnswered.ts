@@ -14,7 +14,6 @@ export async function markAsAnswered(socket: WebSocket, joinCode: string, ROOMS:
         return;
     }
     let isAskAvailable = false;
-    // console.log(ROOMS[joinCode].asks);
     for (let ask of ROOMS[joinCode].asks) {
         if (ask.id === askId) {
             ask.answered = ! ask.answered;

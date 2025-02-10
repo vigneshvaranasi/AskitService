@@ -10,16 +10,12 @@ import { verifyRoom } from "../utils/userAuth";
 
 export async function joinRoom(socket: WebSocket, id: string, ROOMS: ROOMS, joinCode: string) {
     let role:"speaker"|"attendee" = "attendee";
-    console.log('id: ', id);
     const room = await verifyRoom(joinCode, socket);
-    console.log('room: ', room);
     if (!room) {
         socket.close(1008, 'Room not Found');
         return;
     }
     const speakerInDB = room.speaker?.toString();
-    console.log('speakerInDB: ', speakerInDB);
-    console.log("id: ", id);
     if (ROOMS[joinCode]) {
         if (speakerInDB === id){
             socket.close(1008, 'Room is Inactive');
@@ -31,7 +27,6 @@ export async function joinRoom(socket: WebSocket, id: string, ROOMS: ROOMS, join
         })
     } else {
         if (speakerInDB === id) {
-            console.log("Creating in ROOMs")
             ROOMS[joinCode] = {
                 id: room._id.toString(),
                 speaker: {
@@ -48,7 +43,6 @@ export async function joinRoom(socket: WebSocket, id: string, ROOMS: ROOMS, join
             return;
         }
     }
-    console.log('ROOMS[joinCode]: ', ROOMS[joinCode]);
     const joinPingMessage: WsMessage<JoinPingPayload> = {
         type: "joinPing",
         payload: {
