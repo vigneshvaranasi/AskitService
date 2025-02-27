@@ -86,7 +86,7 @@ export async function ask(socket: WebSocket, joinCode: string, ROOMS: ROOMS, ask
         userId:userId.toString(),
         room:ROOMS[joinCode].id.toString()
     }
-    const newAskInDB = await newAsk(newaskDB);
+    const newAskInDB = await newAsk(newaskDB, joinCode);
     if(!newAskInDB){
         socket.send(JSON.stringify({ type: "error", message: "Error adding question to DB" }));
         return;

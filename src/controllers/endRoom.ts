@@ -29,6 +29,7 @@ export async function endRoom(socket:WebSocket, joinCode:string, ROOMS:ROOMS){
         }
     }
     Notify(endRoomNotify, socket);
+    
 
     await CloseRoom(ROOMS[joinCode])
     await endRoomDB(joinCode);

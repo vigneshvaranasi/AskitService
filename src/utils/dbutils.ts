@@ -66,9 +66,17 @@ export async function joinRoominDB(user: any, joinCode: string) {
 }
 
 
-export async function newAsk(ask: any) {
+// Add in ask Collection
+// Add that Id to RoomsModel.asks
+export async function newAsk(ask: any,joinCode:string) {
   try {
     let newAsk = await askModel.create(ask)
+    let room = await retrieveRoomByJoinCode(joinCode)
+    if(!room){
+      return null
+    }
+    room.asks.addToSet(newAsk._id)
+    await room.save()
     return newAsk
   } catch (err) {
     if (err instanceof Error) {
@@ -82,10 +90,12 @@ export async function newAsk(ask: any) {
 
 export async function endRoomDB(joinCode: string) {
   try {
-    // let room = await roomModel.updateOne(
-    //   { joinCode: joinCode },
-      // { activeStatus: false }
-    // )
+    let room = await roomModel.updateOne(
+      { joinCode: joinCode },
+      { activeStatus: false }
+    )
+    
+
   } catch (err) {
     if (err instanceof Error) {
       console.error("Error ending Room: ", err.message);

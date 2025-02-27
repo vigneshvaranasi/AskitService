@@ -10,6 +10,10 @@ export const AskSchema = new Schema({
         required: true,
         ref: 'User'
     },
+    upvotes:{
+        type:Number,
+        default:0
+    },
     room:{
         type:Types.ObjectId,
         ref:'Room'

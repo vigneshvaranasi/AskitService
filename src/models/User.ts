@@ -13,14 +13,6 @@ export const UserSchema = new Schema({
         type:String,
         default:""
     },
-    asks:[{
-        type:Types.ObjectId,
-        ref:"Ask"
-    }],
-    replies:[{
-        type:Types.ObjectId,
-        ref:"Reply"
-    }],
     rooms:[{
         type:Types.ObjectId,
         ref:"Room"
