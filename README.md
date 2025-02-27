@@ -176,10 +176,10 @@ Room {id,joinCode, title, desc,  speakerName (UserRef), Attendees[] (Psuedonym<-
 3. If that socket is not present in the ROOMS[joinCode].attendee, socket.close().
 4. If the socket is not the speaker, socket.close().
 5. Remove the Room from the ROOMS
-6. Notify all the Attendees and Speaker
+6. Ping all the Attendees and Speaker
     ```json
     {
-        "type":"endRoomNotify",
+        "type":"endRoomPing",
         "payload":{
             "message":"Room has been Ended by the Speaker"
         }
