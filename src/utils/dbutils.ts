@@ -90,17 +90,24 @@ export async function newAsk(ask: any,joinCode:string) {
 
 export async function endRoomDB(joinCode: string) {
   try {
-    let room = await roomModel.updateOne(
+    let fulRoom = await roomModel.findOneAndUpdate(
       { joinCode: joinCode },
-      { activeStatus: false }
-    )
-    
+      { activeStatus: false },
+      { new: true }
+    );
+    if (!fulRoom) 
+      return;
+    // If no asks exist, delete the room and update attendees
+    if (!fulRoom.asks || fulRoom.asks.length === 0) {
+      await roomModel.deleteOne({ joinCode: joinCode });
 
-  } catch (err) {
-    if (err instanceof Error) {
-      console.error("Error ending Room: ", err.message);
-    } else {
-      console.error("Error ending Room: ", err);
+      await Promise.all(
+        fulRoom.attendees.map(attendeeId =>
+          userModel.updateOne({ _id: attendeeId }, { $pull: { rooms: fulRoom._id } })
+        )
+      );
     }
+  } catch (err) {
+    console.error("Error ending Room: ", err instanceof Error ? err.message : err);
   }
 }
